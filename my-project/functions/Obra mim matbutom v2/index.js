@@ -20,9 +20,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   const centralPoint = { x: canvasWidth / 2, y: canvasHeight / 2 };
   const initialRadius = 200; // Ajustar radio inicial al nuevo tamaño del canvas
-  const orbitalSpeed = 0.0001; // Velocidad de órbita reducida (a la mitad)
+  const orbitalSpeed = 0.0001;
   const attractionForceMagnitude = 0.00001;
   const tangentialDriftMagnitude = 0.000001;
+
+  let handtrackModel = null;
+  let hands = [];
+  let handBodies = [];
 
   sketch.preload = () => {
     for (let i = 0; i < 26; i++) {
@@ -31,23 +35,43 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     }
   };
 
-  sketch.setup = () => {
+  sketch.setup = async () => {
     sketch.createCanvas(canvasWidth, canvasHeight);
     sketch.imageMode(sketch.CENTER);
 
     video = sketch.createCapture(sketch.VIDEO, () => {
-      // Callback cuando la transmisión de video está lista
       if (video) {
         console.log("Dimensiones de la cámara:", video.width, video.height);
       } else {
         console.error("Error al iniciar la cámara.");
       }
     });
-    video.size(canvasWidth, canvasHeight); // Ajustar el tamaño del video al canvas
-    video.hide(); // Ocultar el elemento de video HTML
+    video.size(canvasWidth, canvasHeight);
+    video.hide();
 
     engine = Engine.create();
     world = engine.world;
+
+    // Inicializar Handtrack
+    const handtrack = require('handtrackjs'); // Importar directamente
+    const modelParams = {
+      flipHorizontal: true,   // flip e.g. for webcam
+      outputStride: 16,
+      iouThreshold: 0.2,
+      scoreThreshold: 0.1,
+      maxNumBoxes: 3,        // detect up to 2 hands
+    };
+    handtrackModel = await handtrack.load(modelParams); // Usar handtrack.load
+    console.log("Modelo de Handtrack cargado");
+    handtrack.startVideo(video.elt).then(function (status) {
+      console.log("Estado del video de Handtrack:", status);
+      if (status) {
+        runHandtrack();
+      } else {
+        console.log("Error al iniciar el video de Handtrack");
+      }
+    });
+
 
     const numLetters = Object.keys(imagenesLetras).length;
     for (let i = 0; i < numLetters; i++) {
@@ -56,7 +80,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       const angle = sketch.map(i, 0, numLetters, 0, sketch.TWO_PI);
       const x = centralPoint.x + initialRadius * sketch.cos(angle);
       const y = centralPoint.y + initialRadius * sketch.sin(angle);
-      const randomRotation = sketch.random(-sketch.PI / 12, sketch.PI / 12); // Rango reducido
+      const randomRotation = sketch.random(-sketch.PI / 12, sketch.PI / 12);
       const nuevoCuerpo = Bodies.rectangle(x, y, img.width * letraScale, img.height * letraScale, {
         frictionAir: 0.05,
         restitution: 0.3,
@@ -88,16 +112,48 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     World.add(world, [ground, ceiling, leftWall, rightWall]);
   };
 
-  sketch.draw = () => {
-    sketch.background(0); // Fondo negro
-
-    if (video && video.width > 0 && video.height > 0) {
-      sketch.push();
-      sketch.translate(canvasWidth, 0);
-      sketch.scale(-1, 1);
-      sketch.image(video, canvasWidth / 2, canvasHeight / 2, canvasWidth, canvasHeight);
-      sketch.pop();
+  async function runHandtrack() {
+    if (handtrackModel) {
+      const predictions = await handtrackModel.detect(video.elt);
+      hands = predictions;
+      updateHandBodies();
+      requestAnimationFrame(runHandtrack);
     }
+  }
+
+  function updateHandBodies() {
+    handBodies.forEach(body => World.remove(world, body));
+    handBodies = [];
+
+    hands.forEach(hand => {
+      // Coordenada x reflejada
+      const reflectedX = canvasWidth - hand.bbox[0] - hand.bbox[2] / 2;
+      const y = hand.bbox[1] + hand.bbox[3] / 2;
+      const radius = Math.max(hand.bbox[2], hand.bbox[3]) / 2; // Radio basado en la dimensión mayor
+
+      const handBody = Bodies.circle(reflectedX, y, radius, { isStatic: false, label: 'hand', frictionAir: 0.1 });
+      handBodies.push(handBody);
+      World.add(world, handBody);
+    });
+  }
+
+  sketch.draw = () => {
+    sketch.background(0);
+
+    sketch.push();
+    sketch.translate(canvasWidth, 0);
+    sketch.scale(-1, 1);
+    sketch.image(video, canvasWidth / 2, canvasHeight / 2, canvasWidth, canvasHeight);
+    // Dibujar las manos detectadas (solo para depuración)
+    // if (hands) {
+    //   for (let i = 0; i < hands.length; i++) {
+    //     const hand = hands[i];
+    //     // sketch.stroke(0, 255, 0);
+    //     // sketch.noFill();
+    //     // sketch.rect(canvasWidth - hand.bbox[0] - hand.bbox[2], hand.bbox[1], hand.bbox[2], hand.bbox[3]);
+    //   }
+    // }
+    sketch.pop();
 
     for (const letraObj of letrasCuerpos) {
       const deltaX = letraObj.cuerpo.position.x - centralPoint.x;
@@ -137,9 +193,14 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       sketch.image(letraObj.img, 0, 0, letraObj.img.width * letraScale, letraObj.img.height * letraScale);
       sketch.pop();
     }
-  };
 
-  // Eliminar la función windowResized ya que el tamaño del canvas ahora es fijo
+    // Dibujar los cuerpos de las manos (solo para depuración)
+    sketch.fill(255, 0, 0, 50);
+    sketch.noStroke();
+    handBodies.forEach(body => {
+      sketch.ellipse(body.position.x, body.position.y, body.circleRadius * 2, body.circleRadius * 2);
+    });
+  };
 
   sketch.mousePressed = () => {
     let letraTocada = null;
@@ -184,6 +245,7 @@ export const inputs = {};
 export const settings = {
   engine: require("@mechanic-design/engine-p5"),
   modules: {
-    matter: require('matter-js')
+    matter: require('matter-js'),
+    handtrack: require('handtrackjs')
   }
 };
