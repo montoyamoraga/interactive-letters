@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mechanic-design/engine-p5": "^2.0.0-beta.11",
-    "matter-js": "^0.20.0"
+    "matter-js": "^0.20.0",
+    "p5.sound": "^0.2.0"
   }
 }
