@@ -1,6 +1,6 @@
 # Interactive Letters
 
-[![Interactive Letters Logo](static/interactive_letters_logo_01.png "Interactive Letters Logo")](https://[link-a-tu-proyecto-deployado])
+[![Imagen del Logo](static/interactive_letters_logo_01.png)]
 
 Una colección de experimentos interactivos con letras generativas, impulsados por la creatividad y la tecnología. Este repositorio contiene varias obras que exploran diferentes formas de interactuar con tipografía a través del movimiento, la cámara web y la física.
 
@@ -31,7 +31,7 @@ Puedes experimentar estas obras en vivo aquí:
 
 1.  **Clona el repositorio:**
     ```bash
-    git clone [https://github.com/delulu?tab=repositories](https://github.com/delulu?tab=repositories)
+    git clone [https://github.com/delulu?tab=repositories]
     cd [nombre del repositorio]
     ```
 2.  **Instala las dependencias (si es necesario):**
