@@ -1,4 +1,4 @@
-# Interactive Letters 🌈✨ *by matbutom*
+# Interactive Letters 🌈✨ *by [@matbutom](instagram.com/matbutom)*
 
 [![Interactive Letters Logo](https://github.com/user-attachments/assets/a3b4f943-80c0-4aa6-84ac-856ee9daac7a)](https://matbutom.github.io/interactive-letters/)
 
