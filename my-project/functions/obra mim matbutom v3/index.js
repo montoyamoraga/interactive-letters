@@ -76,5 +76,5 @@ export const inputs = {};
 
 export const settings = {
   engine: require("@mechanic-design/engine-p5"),
-  modules: {}
+  modules: {},
 };
