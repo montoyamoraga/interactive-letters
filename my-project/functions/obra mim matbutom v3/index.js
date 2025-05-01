@@ -1,7 +1,7 @@
 export const handler = ({ inputs, mechanic, sketch }) => {
   let video;
-  const canvasWidth = 1600;
-  const canvasHeight = 1200;
+  const canvasWidth = window.innerWidth;
+  const canvasHeight = window.innerHeight;
   const gridSize = 16; // Tamaño de la cuadrícula
   let letterImages = {};
   const lettersToLoad = ['x', 's', 'm', 'o', 'u', 'k']; 

@@ -10,12 +10,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   let imagenesLetras = {};
   let letrasCuerpos = [];
+  let initialLetterStates = []; // Array para guardar el estado inicial de cada letra
   let engine;
   let world;
   let mConstraint;
   const canvasWidth = 1080;
   const canvasHeight = 1920;
-  const letraScale = 0.14; // Tamaño de la letra ajustado a 0.16
+  const letraScale = 0.14;
 
   sketch.preload = () => {
     for (let i = 0; i < 26; i++) {
@@ -31,8 +32,8 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     // Inicializar el motor de física
     engine = Engine.create();
     world = engine.world;
-    engine.world.gravity.y = 0.5; // Fuerza de gravedad
-    engine.world.frictionAir = 0.02; // Añadir fricción al aire
+    engine.world.gravity.y = 0.5;
+    engine.world.frictionAir = 0.02;
 
     // Crear los bordes del canvas como cuerpos estáticos
     const bordeGrosor = 100;
@@ -43,24 +44,30 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
     World.add(world, [ground, ceiling, leftWall, rightWall]);
 
-    const margin = 50; // Margen para evitar que las letras aparezcan demasiado cerca del borde
+    const margin = 50;
 
     for (const caracter in imagenesLetras) {
       const img = imagenesLetras[caracter];
-      // Posición aleatoria dentro del canvas con un margen
       const randomX = sketch.random(margin, canvasWidth - margin);
-      const randomY = sketch.random(margin, canvasHeight * 0.6); // Inicializar en la mitad superior
-      // Rotación inicial aleatoria
-      const randomRotation = sketch.random(-sketch.PI / 6, sketch.PI / 6); // Rotación entre -30 y 30 grados
+      const randomY = sketch.random(margin, canvasHeight * 0.6);
+      const randomRotation = sketch.random(-sketch.PI / 6, sketch.PI / 6);
 
       const nuevoCuerpo = Bodies.rectangle(randomX, randomY, img.width * letraScale, img.height * letraScale, {
         friction: 0.3,
         restitution: 0.3,
-        angle: randomRotation, // Aplicar la rotación inicial
+        angle: randomRotation,
         label: caracter
       });
       letrasCuerpos.push({ cuerpo: nuevoCuerpo, img: img });
       World.add(world, nuevoCuerpo);
+
+      // Guardar el estado inicial
+      initialLetterStates.push({
+        position: { x: randomX, y: randomY },
+        angle: randomRotation,
+        velocity: { x: 0, y: 0 },
+        angularVelocity: 0
+      });
     }
 
     // Configurar la interacción con el ratón
@@ -76,10 +83,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       }
     });
     World.add(world, mConstraint);
+
+    // Resetear las letras cada 2 minutos
+    setInterval(resetLetters, 19999);
   };
 
   sketch.draw = () => {
-    sketch.background(220);
+    sketch.background(255);
 
     // Actualizar el motor de física
     Engine.update(engine);
@@ -94,14 +104,6 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       sketch.image(letraObj.img, 0, 0, letraObj.img.width * letraScale, letraObj.img.height * letraScale);
       sketch.pop();
     }
-
-    // Opcional: Dibujar los bordes para visualización
-    // sketch.noStroke();
-    // sketch.fill(170);
-    // sketch.rect(canvasWidth / 2, canvasHeight + bordeGrosor / 2, canvasWidth, bordeGrosor);
-    // sketch.rect(canvasWidth / 2, -bordeGrosor / 2, canvasWidth, bordeGrosor);
-    // sketch.rect(-bordeGrosor / 2, canvasHeight / 2, bordeGrosor, canvasHeight);
-    // sketch.rect(canvasWidth + bordeGrosor / 2, canvasHeight / 2, bordeGrosor, canvasHeight);
   };
 
   sketch.mousePressed = () => {
@@ -111,6 +113,15 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   sketch.mouseReleased = () => {
     // La interacción de arrastrar la maneja MouseConstraint
   };
+
+  function resetLetters() {
+    letrasCuerpos.forEach((letraObj, index) => {
+      Body.setPosition(letraObj.cuerpo, initialLetterStates[index].position);
+      Body.setAngle(letraObj.cuerpo, initialLetterStates[index].angle);
+      Body.setVelocity(letraObj.cuerpo, initialLetterStates[index].velocity);
+      Body.setAngularVelocity(letraObj.cuerpo, initialLetterStates[index].angularVelocity);
+    });
+  }
 };
 
 export const inputs = {};

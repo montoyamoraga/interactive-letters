@@ -16,11 +16,11 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   let mConstraint;
   let video;
   const letraScale = 0.08; // Tamaño de las letras
-  let canvasWidth = 1280; // Establecer ancho del canvas
-  let canvasHeight = 960; // Establecer alto del canvas
+  let canvasWidth = window.innerWidth; // Ancho del canvas igual al ancho de la ventana
+  let canvasHeight = window.innerHeight; // Alto del canvas igual al alto de la ventana
 
   const centralPoint = { x: canvasWidth / 2, y: canvasHeight / 2 };
-  const initialRadius = 200; // Ajustar radio inicial al nuevo tamaño del canvas
+  const initialRadius = Math.min(canvasWidth, canvasHeight) * 0.2; // Radio inicial proporcional al tamaño del canvas
   const orbitalSpeed = 0.0001;
   const attractionForceMagnitude = 0.00001;
   const tangentialDriftMagnitude = 0.000001;
@@ -47,7 +47,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
         console.error("Error al iniciar la cámara.");
       }
     });
-    video.size(canvasWidth, canvasHeight);
+    video.size(canvasWidth, canvasHeight); // Tamaño del video igual al tamaño del canvas
     video.hide();
 
     engine = Engine.create();
