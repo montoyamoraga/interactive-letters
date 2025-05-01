@@ -7,7 +7,8 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   const Body = Matter.Body;
   const Mouse = Matter.Mouse;
   const MouseConstraint = Matter.MouseConstraint;
-
+  
+  let initialLetterStates = []; 
   let imagenesLetras = {};
   let letrasCuerpos = [];
   let engine;
@@ -71,6 +72,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
         console.log("Error al iniciar el video de Handtrack");
       }
     });
+    
 
 
     const numLetters = Object.keys(imagenesLetras).length;
@@ -89,6 +91,14 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       });
       letrasCuerpos.push({ cuerpo: nuevoCuerpo, img: img });
       World.add(world, nuevoCuerpo);
+
+      // Guardar el estado inicial
+      initialLetterStates.push({
+        position: { x: x, y: y },
+        angle: randomRotation,
+        velocity: { x: 0, y: 0 },
+        angularVelocity: 0
+      });
     }
 
     const canvasMouse = Mouse.create(sketch.canvas.elt);
@@ -110,6 +120,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     const leftWall = Bodies.rectangle(-bordeGrosor / 2, canvasHeight / 2, bordeGrosor, canvasHeight, { isStatic: true });
     const rightWall = Bodies.rectangle(canvasWidth + bordeGrosor / 2, canvasHeight / 2, bordeGrosor, canvasHeight, { isStatic: true });
     World.add(world, [ground, ceiling, leftWall, rightWall]);
+    setInterval(resetLetters, 19999);
   };
 
   async function runHandtrack() {
@@ -194,50 +205,21 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       sketch.pop();
     }
 
-    // Dibujar los cuerpos de las manos (solo para depuración)
     sketch.fill(255, 0, 0, 50);
     sketch.noStroke();
     handBodies.forEach(body => {
       sketch.ellipse(body.position.x, body.position.y, body.circleRadius * 2, body.circleRadius * 2);
     });
   };
-
-  sketch.mousePressed = () => {
-    let letraTocada = null;
-    for (const letraObj of letrasCuerpos) {
-      const pos = letraObj.cuerpo.position;
-      const img = letraObj.img;
-      const escala = letraScale;
-      const ancho = img.width * escala;
-      const alto = img.height * escala;
-
-      if (sketch.mouseX > pos.x - ancho / 2 &&
-          sketch.mouseX < pos.x + ancho / 2 &&
-          sketch.mouseY > pos.y - alto / 2 &&
-          sketch.mouseY < pos.y + alto / 2) {
-        letraTocada = letraObj.cuerpo;
-        if (mConstraint && mConstraint.mouse) {
-          mConstraint.mouse.element = sketch.canvas.elt;
-          mConstraint.body = letraTocada;
-          Matter.Mouse.setOffset(mConstraint.mouse, { x: sketch.mouseX - pos.x, y: sketch.mouseY - pos.y });
-        }
-        break;
-      }
-    }
-  };
-
-  sketch.mouseDragged = () => {
-    if (mConstraint && mConstraint.body) {
-      Matter.Body.setPosition(mConstraint.body, { x: sketch.mouseX, y: sketch.mouseY });
-    }
-  };
-
-  sketch.mouseReleased = () => {
-    if (mConstraint && mConstraint.mouse) {
-      mConstraint.body = null;
-      mConstraint.mouse.element = null;
-    }
-  };
+  
+  function resetLetters() {
+    letrasCuerpos.forEach((letraObj, index) => {
+      Body.setPosition(letraObj.cuerpo, initialLetterStates[index].position);
+      Body.setAngle(letraObj.cuerpo, initialLetterStates[index].angle);
+      Body.setVelocity(letraObj.cuerpo, initialLetterStates[index].velocity);
+      Body.setAngularVelocity(letraObj.cuerpo, initialLetterStates[index].angularVelocity);
+    });
+  }
 };
 
 export const inputs = {};
