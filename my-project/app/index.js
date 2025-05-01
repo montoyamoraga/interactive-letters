@@ -1,22 +1,60 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export const SideBar = ({ children }) => {
-  // Renderiza solo el primer elemento del array children, que parece ser la selección de funciones
+  const [opacity, setOpacity] = useState(0);
   const functionSelector = children && children[0];
+
   const containerStyle = {
     position: 'absolute',
-    top: '20px', // Ajusta la distancia desde la parte superior si es necesario
-    right: '20px', // Cambiamos 'left' a 'right' para moverlo a la derecha
-    background: 'rgba(0, 0, 0, 0.7)',
+    top: '20px',
+    right: '20px',
+    background: 'rgba(0, 0, 0, 0.3)',
     color: 'white',
-    padding: '10px',
+    padding: '8px', // Disminuimos el padding del contenedor
     borderRadius: '5px',
     zIndex: 1000,
+    opacity: opacity,
+    transition: 'opacity 0.3s ease-in-out',
+  };
+  const labelStyle = {
+    display: 'block',
+    marginBottom: '3px', // Disminuimos el margen inferior del label
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: '0.5em', // Disminuimos el tamaño de la fuente del label
+  };
+  const selectStyle = {
+    padding: '4px', // Disminuimos el padding del select
+    borderRadius: '3px',
+    background: 'rgba(255, 255, 255, 0.1)',
+    color: 'white',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    fontSize: '0.5em', // Disminuimos el tamaño de la fuente del select
+  };
+  const optionStyle = {
+    background: 'rgba(0, 0, 0, 0.7)',
+    color: 'white',
+    fontSize: '0.5em', // Disminuimos el tamaño de la fuente de las opciones
+  };
+
+  const handleMouseEnter = () => {
+    setOpacity(1);
+  };
+
+  const handleMouseLeave = () => {
+    setOpacity(0.2);
   };
 
   return (
-    <div style={containerStyle}>
-      {functionSelector}
+    <div
+      style={containerStyle}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <label htmlFor="functionSelect" style={labelStyle}>Seleccionar Obra:</label>
+      {functionSelector && React.cloneElement(functionSelector, {
+        style: { ...functionSelector.props.style, ...selectStyle },
+        selectOptionsStyle: optionStyle
+      })}
     </div>
   );
 };
