@@ -1,6 +1,6 @@
 # Interactive Letters
 
-[![Imagen del Logo](![interactive_letters_logo_01](https://github.com/user-attachments/assets/3852f85d-066f-41c3-abf9-6db32abb9b6d))]
+[![Interactive Letters Logo](static/interactive_letters_logo_01.png "Interactive Letters Logo")](https://[link-a-tu-proyecto-deployado])
 
 Una colección de experimentos interactivos con letras generativas, impulsados por la creatividad y la tecnología. Este repositorio contiene varias obras que exploran diferentes formas de interactuar con tipografía a través del movimiento, la cámara web y la física.
 
