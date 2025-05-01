@@ -55,7 +55,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     // Inicializar Handtrack
     const handtrack = require('handtrackjs'); // Importar directamente
     const modelParams = {
-      flipHorizontal: true,   // flip e.g. for webcam
+      flipHorizontal: false,   // flip e.g. for webcam
       outputStride: 16,
       iouThreshold: 0.2,
       scoreThreshold: 0.1,
