@@ -41,11 +41,12 @@ Este proyecto ha sido creado utilizando las siguientes herramientas y librerías
 
 Si eres curioso y quieres ver cómo se hizo la magia, ¡el código está abierto para ti! Clona este repositorio y sumérgete en el corazón de Interactive Letters:
 
-```markdown
 Si quieres experimentar localmente (¡y quizás crear tus propias maravillas!):
 
+```javascript
+
 // clona el repositorio desde tu terminal!
-git clone [https://github.com/matbutom/interactive-letters.git](https://github.com/matbutom/interactive-letters.git)
+gh repo clone matbutom/interactive-letters
 
 // dirigete al proyecto
 cd interactive-letters
