@@ -13,11 +13,23 @@ Este cofre de maravillas contiene tres experiencias únicas:
 1.  **camera letter effects** 👆
     * Sumérgete en un lienzo donde las letras cobran vida al tocarlas. Cada toque las hace saltar, girar y bailar, creando un espectáculo visual lleno de energía. ¡Ideal para que los niños exploren la forma de las letras de una manera táctil y juguetona!
 
+
+https://github.com/user-attachments/assets/62c4fb7d-b387-46ba-8a19-2e37414647c3
+
+
 2.  **hand punching letters** 📸
     * ¡Prepárate para verte rodeado de un mágico espejo de letras! Al moverte frente a la cámara web, tus movimientos se transforman en un dinámico patrón de letras que imitan tus gestos. ¡Una forma divertida de conectar su propia imagen con el mundo de las letras!
 
+
+https://github.com/user-attachments/assets/c9c18613-27aa-4910-8c82-9e09a0d7e897
+
+
 3.  **crazy gravity letters** 👋
     * ¡Usa tus manos como imanes de letras! Al interactuar con la cámara web, las letras se sentirán atraídas por tus manos, orbitando a su alrededor como pequeñas lunas. ¡Una experiencia intuitiva que permite a los niños sentir la fuerza y la forma de las letras con sus propios movimientos!
+  
+
+https://github.com/user-attachments/assets/adfa77b6-ea7d-4850-9e0a-1add73c016c6
+
 
 ## ¡A Jugar Ahora! 🕹️
 
