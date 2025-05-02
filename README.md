@@ -30,15 +30,6 @@ https://github.com/user-attachments/assets/c9c18613-27aa-4910-8c82-9e09a0d7e897
 
 https://github.com/user-attachments/assets/adfa77b6-ea7d-4850-9e0a-1add73c016c6
 
-
-## ¡A Jugar Ahora! 🕹️
-
-Puedes experimentar estas maravillosas obras directamente en tu navegador:
-
-[https://matbutom.github.io/interactive-letters/](https://matbutom.github.io/interactive-letters/)
-
-¡Solo haz clic y la aventura tipográfica comenzará!
-
 ## Construido con Amor y Tecnología ✨
 
 Este proyecto ha sido creado utilizando las siguientes herramientas y librerías:
