@@ -28,14 +28,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify dependencies
+        run: npm ls
+
       - name: Clean possible lockfiles
         run: rm -f mechanic.json.lock
 
       - name: Build Mechanic static site
-        run: npm run build
+        run: npm run build || { echo "Build failed"; exit 1; }
 
-      - name: List build output
-        run: ls -la ./dist
+      - name: Debug Build Output
+        run: ls -la ./dist || { echo "./dist directory is missing"; exit 1; }
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

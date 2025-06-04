@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "mechanic build --data ./mechanic-data.json",
+    "build": "mechanic build",
     "serve": "mechanic serve"
   },
   "dependencies": {
