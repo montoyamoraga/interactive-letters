@@ -4,6 +4,7 @@
     "serve": "mechanic serve"
   },
   "dependencies": {
+    "@mechanic-design/cli": "^2.0.0-beta.11",
     "@mechanic-design/core": "^2.0.0-beta.11",
     "@mechanic-design/engine-p5": "^2.0.0-beta.11",
     "@mechanic-design/fonts": "^1.1.0",
