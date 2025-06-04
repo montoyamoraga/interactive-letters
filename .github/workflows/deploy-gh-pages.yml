@@ -16,7 +16,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('my-project/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
@@ -27,12 +27,15 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./my-project
 
       - name: Clean possible lockfiles
         run: rm -f mechanic.json.lock
+        working-directory: ./my-project
 
       - name: Build Mechanic static site
         run: npm run build
+        working-directory: ./my-project
 
       - name: Check if dist exists
         run: |
@@ -40,12 +43,14 @@ jobs:
             echo "ERROR: ./dist was not created by the build."
             exit 1
           fi
+        working-directory: ./my-project
 
       - name: List build output
         run: ls -la ./dist
+        working-directory: ./my-project
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./my-project/dist
