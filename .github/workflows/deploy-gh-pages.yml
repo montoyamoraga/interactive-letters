@@ -60,6 +60,10 @@ jobs:
           sed -i 's|src="/|src="|g' ./my-project/dist/index.html
           sed -i 's|="\/|="|g' ./my-project/dist/index.html
 
+      - name: Fix asset paths in CSS for GitHub Pages
+        run: |
+          find ./my-project/dist -name "*.css" -exec sed -i 's|url(/|url(|g' {} +
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
