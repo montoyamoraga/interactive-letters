@@ -54,21 +54,6 @@ jobs:
         run: ls -la ./dist
         working-directory: ./my-project
 
-      - name: Fix asset paths in CSS for GitHub Pages
-        run: |
-          find ./my-project/dist -name "*.css" -exec sed -i 's|url(/|url(|g' {} +
-
-      - name: Fix asset paths and add <base> to all HTML for GitHub Pages
-        run: |
-          for file in ./my-project/dist/*.html; do
-            sed -i 's|href="/|href="|g' "$file"
-            sed -i 's|src="/|src="|g' "$file"
-            # Elimina cualquier <base> existente para evitar duplicados
-            sed -i '/<base href="/d' "$file"
-            # Inserta <base href="/interactive-letters/" /> justo después de <head>
-            sed -i '/<head>/a\<base href="/interactive-letters/" />' "$file"
-          done
-
       - name: Add .nojekyll
         run: touch ./my-project/dist/.nojekyll
 
