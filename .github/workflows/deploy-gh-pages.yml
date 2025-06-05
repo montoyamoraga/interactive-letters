@@ -54,6 +54,12 @@ jobs:
         run: ls -la ./dist
         working-directory: ./my-project
 
+      - name: Fix asset paths for GitHub Pages
+        run: |
+          sed -i 's|href="/|href="|g' ./my-project/dist/index.html
+          sed -i 's|src="/|src="|g' ./my-project/dist/index.html
+          sed -i 's|="\/|="|g' ./my-project/dist/index.html
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
