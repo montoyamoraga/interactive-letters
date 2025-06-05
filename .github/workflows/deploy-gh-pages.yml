@@ -63,8 +63,14 @@ jobs:
           for file in ./my-project/dist/*.html; do
             sed -i 's|href="/|href="|g' "$file"
             sed -i 's|src="/|src="|g' "$file"
+            # Elimina cualquier <base> existente para evitar duplicados
+            sed -i '/<base href="/d' "$file"
+            # Inserta <base href="/interactive-letters/"> justo después de <head>
             sed -i '/<head>/a\<base href="/interactive-letters/">' "$file"
           done
+
+      - name: Add .nojekyll
+        run: touch ./my-project/dist/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
