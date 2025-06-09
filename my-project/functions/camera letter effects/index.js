@@ -1,10 +1,10 @@
 export const handler = ({ inputs, mechanic, sketch }) => {
   let video;
-  const canvasWidth = window.innerWidth;
-  const canvasHeight = window.innerHeight;
-  const gridSize = 16; // Tamaño de la cuadrícula
+  const canvasWidth = 1080;
+  const canvasHeight = 1920;
+  const gridSize = 16;
   let letterImages = {};
-  const lettersToLoad = ['x', 's', 'm', 'o', 'u', 'k']; 
+  const lettersToLoad = ['x', 's', 'm', 'o', 'u', 'k'];
 
   sketch.preload = () => {
     lettersToLoad.forEach(letter => {
@@ -18,9 +18,9 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     sketch.background(0);
     sketch.imageMode(sketch.CENTER);
 
+    // Captura video horizontal para asegurar buena calidad al recortar
     video = sketch.createCapture(sketch.VIDEO, () => {
-      console.log("Cámara iniciada. Dimensiones:", video.width, video.height);
-      video.size(canvasWidth / gridSize, canvasHeight / gridSize);
+      video.size(1280, 720);
       video.hide();
     });
   };
@@ -29,18 +29,50 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     sketch.background(0);
 
     sketch.push();
+    // Rota el canvas 90° horario para vertical
     sketch.translate(canvasWidth, 0);
-    sketch.scale(-1, 1);
+    sketch.rotate(sketch.HALF_PI);
 
     if (video && video.width > 0) {
       video.loadPixels();
-      for (let y = 0; y < video.height; y++) {
-        for (let x = 0; x < video.width; x++) {
-          const index = (x + y * video.width) * 4;
+
+      // Dimensiones reales del video
+      const camW = video.width;
+      const camH = video.height;
+
+      // Calcula la escala para crop to fill
+      // (Por rotación: camW llena canvasHeight, camH llena canvasWidth)
+      const scale = Math.max(canvasHeight / camW, canvasWidth / camH);
+
+      // Tamaño del área del video que se usará para cubrir el canvas
+      const cropW = canvasHeight / scale;
+      const cropH = canvasWidth / scale;
+
+      // Offset para centrar la imagen recortada
+      const offsetX = (camW - cropW) / 2;
+      const offsetY = (camH - cropH) / 2;
+
+      // Ahora, recorre TODO el canvas (no solo el área del video)
+      for (let y = 0; y < canvasHeight; y += gridSize) {
+        for (let x = 0; x < canvasWidth; x += gridSize) {
+          // Centro de la celda en canvas
+          const cx = x + gridSize / 2;
+          const cy = y + gridSize / 2;
+
+          // Mapear cx/cy al espacio del video recortado y rotado:
+          // cx (horizontal en canvas) → vertical en video (camH)
+          // cy (vertical en canvas) → horizontal en video (camW)
+          const videoX = offsetX + (cy / canvasHeight) * cropW;
+          const videoY = offsetY + (cx / canvasWidth) * cropH;
+
+          // Redondea y limita para no salirte del video
+          const px = Math.floor(sketch.constrain(videoX, 0, camW - 1));
+          const py = Math.floor(sketch.constrain(videoY, 0, camH - 1));
+
+          const index = (px + py * camW) * 4;
           const brightness = (video.pixels[index] + video.pixels[index + 1] + video.pixels[index + 2]) / 3;
           let currentLetter = '';
 
-          // rangos de brillo para 6 letras
           if (brightness < 43) {
             currentLetter = 'x';
           } else if (brightness < 86) {
@@ -58,8 +90,8 @@ export const handler = ({ inputs, mechanic, sketch }) => {
           if (letterImages[currentLetter]) {
             sketch.image(
               letterImages[currentLetter],
-              x * gridSize + gridSize / 2,
-              y * gridSize + gridSize / 2,
+              cy,
+              cx,
               gridSize,
               gridSize * (letterImages[currentLetter].height / letterImages[currentLetter].width)
             );
