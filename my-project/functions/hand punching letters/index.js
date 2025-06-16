@@ -1,5 +1,4 @@
 export const handler = ({ inputs, mechanic, sketch }) => {
-  // Importar Matter.js
   const Matter = require('matter-js');
   const Engine = Matter.Engine;
   const World = Matter.World;
@@ -15,12 +14,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   let world;
   let mConstraint;
   let video;
-  const letraScale = 0.08; // Tamaño de las letras
-  let canvasWidth = window.innerWidth; // Ancho del canvas igual al ancho de la ventana
-  let canvasHeight = window.innerHeight; // Alto del canvas igual al alto de la ventana
+  const letraScale = 0.08;
+  // Canvas vertical fijo
+  const canvasWidth = 1080;
+  const canvasHeight = 1920;
 
   const centralPoint = { x: canvasWidth / 2, y: canvasHeight / 2 };
-  const initialRadius = Math.min(canvasWidth, canvasHeight) * 0.2; // Radio inicial proporcional al tamaño del canvas
+  const initialRadius = Math.min(canvasWidth, canvasHeight) * 0.2;
   const orbitalSpeed = 0.0001;
   const attractionForceMagnitude = 0.00001;
   const tangentialDriftMagnitude = 0.000001;
@@ -40,6 +40,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     sketch.createCanvas(canvasWidth, canvasHeight);
     sketch.imageMode(sketch.CENTER);
 
+    // Captura video horizontal para asegurar buena calidad al recortar
     video = sketch.createCapture(sketch.VIDEO, () => {
       if (video) {
         console.log("Dimensiones de la cámara:", video.width, video.height);
@@ -47,22 +48,23 @@ export const handler = ({ inputs, mechanic, sketch }) => {
         console.error("Error al iniciar la cámara.");
       }
     });
-    video.size(canvasWidth, canvasHeight); // Tamaño del video igual al tamaño del canvas
+    // Usa máxima resolución estándar
+    video.size(1280, 720);
     video.hide();
 
     engine = Engine.create();
     world = engine.world;
 
-    // Inicializar Handtrack
-    const handtrack = require('handtrackjs'); // Importar directamente
+    // Handtrack
+    const handtrack = require('handtrackjs');
     const modelParams = {
-      flipHorizontal: false,   // flip e.g. for webcam
+      flipHorizontal: false,
       outputStride: 16,
       iouThreshold: 0.2,
       scoreThreshold: 0.1,
-      maxNumBoxes: 3,        // detect up to 2 hands
+      maxNumBoxes: 3,
     };
-    handtrackModel = await handtrack.load(modelParams); // Usar handtrack.load
+    handtrackModel = await handtrack.load(modelParams);
     console.log("Modelo de Handtrack cargado");
     handtrack.startVideo(video.elt).then(function (status) {
       console.log("Estado del video de Handtrack:", status);
@@ -72,8 +74,6 @@ export const handler = ({ inputs, mechanic, sketch }) => {
         console.log("Error al iniciar el video de Handtrack");
       }
     });
-    
-
 
     const numLetters = Object.keys(imagenesLetras).length;
     for (let i = 0; i < numLetters; i++) {
@@ -92,7 +92,6 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       letrasCuerpos.push({ cuerpo: nuevoCuerpo, img: img });
       World.add(world, nuevoCuerpo);
 
-      // Guardar el estado inicial
       initialLetterStates.push({
         position: { x: x, y: y },
         angle: randomRotation,
@@ -137,11 +136,9 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     handBodies = [];
 
     hands.forEach(hand => {
-      // Coordenada x reflejada
       const reflectedX = canvasWidth - hand.bbox[0] - hand.bbox[2] / 2;
       const y = hand.bbox[1] + hand.bbox[3] / 2;
-      const radius = Math.max(hand.bbox[2], hand.bbox[3]) / 2; // Radio basado en la dimensión mayor
-
+      const radius = Math.max(hand.bbox[2], hand.bbox[3]) / 2;
       const handBody = Bodies.circle(reflectedX, y, radius, { isStatic: false, label: 'hand', frictionAir: 0.1 });
       handBodies.push(handBody);
       World.add(world, handBody);
@@ -151,21 +148,29 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   sketch.draw = () => {
     sketch.background(0);
 
+    // --- Dibuja el video vertical, crop to fill, centrado, sin deformar ---
     sketch.push();
-    sketch.translate(canvasWidth, 0);
-    sketch.scale(-1, 1);
-    sketch.image(video, canvasWidth / 2, canvasHeight / 2, canvasWidth, canvasHeight);
-    // Dibujar las manos detectadas (solo para depuración)
-    // if (hands) {
-    //   for (let i = 0; i < hands.length; i++) {
-    //     const hand = hands[i];
-    //     // sketch.stroke(0, 255, 0);
-    //     // sketch.noFill();
-    //     // sketch.rect(canvasWidth - hand.bbox[0] - hand.bbox[2], hand.bbox[1], hand.bbox[2], hand.bbox[3]);
-    //   }
-    // }
+    const camW = video.width;
+    const camH = video.height;
+
+    // Calcula la escala para crop-to-fill (rellenar el canvas completamente)
+    const scale = Math.max(canvasWidth / camH, canvasHeight / camW);
+
+    // Tamaño del video escalado
+    const drawW = camW * scale;
+    const drawH = camH * scale;
+
+    // Rota el canvas 90° horario, centra y aplica efecto espejo si quieres
+    sketch.translate(canvasWidth / 2, canvasHeight / 2);
+    sketch.rotate(sketch.HALF_PI);
+    sketch.scale(-1, 1); // efecto espejo, remueve si no lo quieres
+
+    // IMPORTANTE: por la rotación, drawW y drawH se invierten
+    sketch.image(video, 0, 0, drawH, drawW);
+
     sketch.pop();
 
+    // --- Lógica Matter.js igual que antes ---
     for (const letraObj of letrasCuerpos) {
       const deltaX = letraObj.cuerpo.position.x - centralPoint.x;
       const deltaY = letraObj.cuerpo.position.y - centralPoint.y;
