@@ -58,7 +58,10 @@ jobs:
         run: touch ./my-project/dist/.nojekyll
 
       - run: npm install
+        working-directory: ./my-project
+        
       - run: npm run build-ghpages
+        working-directory: ./my-project
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
