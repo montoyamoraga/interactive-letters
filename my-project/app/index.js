@@ -53,7 +53,7 @@ export const SideBar = ({ children }) => {
       <label htmlFor="functionSelect" style={labelStyle}>Seleccionar Obra:</label>
       {functionSelector && React.cloneElement(functionSelector, {
         style: { ...functionSelector.props.style, ...selectStyle },
-        selectOptionsStyle: optionStyle
+        selectoptionsstyle: optionStyle
       })}
     </div>
   );
