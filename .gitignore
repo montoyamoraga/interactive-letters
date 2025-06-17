@@ -1,8 +1,8 @@
 # Node modules
-node_modules/
+**/node_modules/
 
 # Build output
-dist/
+**/dist/
 
 # Logs
 npm-debug.log*
@@ -11,7 +11,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # OS files
-.DS_Store
+**/.DS_Store
 Thumbs.db
 
 # Environment variables
