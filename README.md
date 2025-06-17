@@ -44,17 +44,17 @@ Si eres curioso y quieres ver cómo se hizo la magia, ¡el código está abierto
 
 Si quieres experimentar localmente (¡y quizás crear tus propias maravillas!):
 
-```javascript
+    ```javascript
 
-// clona el repositorio desde tu terminal!
-gh repo clone matbutom/interactive-letters
+    // clona el repositorio desde tu terminal!
+    gh repo clone matbutom/interactive-letters
 
-// dirigete al proyecto
-cd interactive-letters
+    // dirigete al proyecto
+    cd interactive-letters
 
-// instala las dependencias de npm
-npm install
+    // instala las dependencias de npm
+    npm install
 
-// corre el proyecto localmente en tu máquina :)
-npm run dev
-```
+    // corre el proyecto localmente en tu máquina :)
+    npm run dev
+    ```
